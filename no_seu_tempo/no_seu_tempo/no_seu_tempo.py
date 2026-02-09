@@ -76,6 +76,11 @@ class Pascoa(Feriado):
     def no_ano(cls, ano: int) -> date:
         return easter(ano)
 
+    @classmethod
+    def nomes(cls) -> list:
+        return ['pascoa', 'páscoa']
+
+
 class Carnaval(Feriado):
     @classmethod
     def no_ano(cls, ano: int) -> date:
@@ -195,6 +200,7 @@ class NoSeuTempo:
                 MARCA_FIM:    (20,  3),
             },
         }
+        txt = re.sub(r'\binicio\b|\binício\b', MARCA_COMECO, txt)
         prep = r"\s+d[eao]\s+"
         encontrado = re.findall(
             fr'({MARCA_COMECO}|{MARCA_FIM}){prep}(\w+)({prep})*(.*)', txt
@@ -547,6 +553,35 @@ class NoSeuTempo:
         print('>>>> Até breve! ;)\n', '*'*50)
 
 
+def converte_data(expr: str, dt_cadastro: str|date ='') -> date:
+    """
+    converte_data
+    ---
+    Quando o campo data está preenchido com uma expressão,
+    essa expressão é convertida para uma data válida;
+    > O parâmetro dt_cadastro é a data em que essa expressão foi gravada e pode...
+    * não ser passada, então usa a data atual;
+    * ser passada como str, então converte ela também;
+    * ser passada como date.
+    ### Vantagens
+    > conversões que outras bibliotecas *não* fazem.
+    * daqui a 15 dias
+    * quarta passada (...ou... ultima quarta-feira)
+    * próxima quinta (...ou... quinta-feira que vem)
+    * carnaval
+    * uma semana antes da pascoa do ano passado
+    * 1a segunda-feira de abril de 2023
+    * em três dias
+    * 8 dias depois do fim da primavera
+    * Fiz 38 anos em 3 de novembro
+    """
+    if not dt_cadastro:
+        dt_cadastro = date.today()
+    elif isinstance(dt_cadastro, str):
+        dt_cadastro = NoSeuTempo(dt_cadastro).resultado
+    NoSeuTempo.DT_ATUAL = dt_cadastro
+    return NoSeuTempo(expr).resultado
+
+
 if __name__ == "__main__":
-    print( NoSeuTempo('última terça de abril').resultado )
-    # NoSeuTempo.prompt()
+    print( converte_data('mes que vem'))
